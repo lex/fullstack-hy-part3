@@ -7,7 +7,7 @@ mongoose.connect(url);
 mongoose.Promise = global.Promise;
 
 const personSchema = new Schema({
-  name: String,
+  name: { type: String, unique: true },
   number: String
 });
 

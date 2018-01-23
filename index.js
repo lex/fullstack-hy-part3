@@ -8,6 +8,8 @@ const PORT = process.env.PORT || 3001;
 
 const Person = require("./models/person");
 
+const GENERIC_ERROR = { error: "something went wrong" };
+
 morgan.token("body", function(req, res) {
   return JSON.stringify(req.body);
 });
@@ -28,22 +30,18 @@ app.get("/api/persons", (req, res) => {
     .then(persons => res.json(persons.map(Person.format)))
     .catch(error => {
       console.log(error);
-      response.status(400).send({ error: "something went wrong" });
+      res.status(400).send(GENERIC_ERROR);
     });
 });
 
 app.get("/api/persons/:id", (req, res) => {
   Person.findById(req.params.id)
     .then(person => {
-      if (person) {
-        res.json(Person.format(person));
-      } else {
-        res.status(404).end();
-      }
+      res.json(Person.format(person));
     })
     .catch(error => {
       console.log(error);
-      response.status(400).send({ error: "something went wrong" });
+      res.status(400).send(GENERIC_ERROR);
     });
 });
 
@@ -56,7 +54,7 @@ app.delete("/api/persons/:id", (req, res) => {
     })
     .catch(error => {
       console.log(error);
-      response.status(400).send({ error: "something went wrong" });
+      res.status(400).send(GENERIC_ERROR);
     });
 });
 
@@ -82,7 +80,7 @@ app.post("/api/persons", (req, res) => {
     })
     .catch(error => {
       console.log(error);
-      response.status(400).send({ error: "something went wrong" });
+      res.status(400).send(GENERIC_ERROR);
     });
 });
 
@@ -97,7 +95,7 @@ app.put("/api/persons/:id", (req, res) => {
     })
     .catch(error => {
       console.log(error);
-      response.status(400).send({ error: "something went wrong" });
+      res.status(400).send(GENERIC_ERROR);
     });
 });
 
@@ -112,7 +110,7 @@ app.get("/info", (req, res) => {
     })
     .catch(error => {
       console.log(error);
-      response.status(400).send({ error: "something went wrong" });
+      res.status(400).send(GENERIC_ERROR);
     });
 });
 
