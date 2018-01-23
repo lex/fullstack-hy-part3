@@ -102,11 +102,18 @@ app.put("/api/persons/:id", (req, res) => {
 });
 
 app.get("/info", (req, res) => {
-  res.send(
-    `<p>there are ${persons.length} person${
-      persons.length === 1 ? "" : "s"
-    } in the phone book</p><p>${new Date()}</p>`
-  );
+  Person.find({})
+    .then(persons => {
+      res.send(
+        `<p>there are ${persons.length} person${
+          persons.length === 1 ? "" : "s"
+        } in the phone book</p><p>${new Date()}</p>`
+      );
+    })
+    .catch(error => {
+      console.log(error);
+      response.status(400).send({ error: "something went wrong" });
+    });
 });
 
 app.listen(PORT, () => {
