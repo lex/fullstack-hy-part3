@@ -15,7 +15,7 @@ const Person = mongoose.model("Person", {
   number: String
 });
 
-if (process.argv.length == 2) {
+if (process.argv.length === 2) {
   console.log("puhelinluettelo:");
   Person.find({})
     .then(res => {
