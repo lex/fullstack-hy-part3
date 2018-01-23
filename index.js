@@ -32,10 +32,21 @@ app.get("/api/persons", (req, res) => {
   res.json(persons);
 });
 
+app.get("/api/persons/:id", (req, res) => {
+  const id = Number(req.params.id);
+  const person = persons.find(p => p.id === id);
+
+  if (person) {
+    res.json(person);
+  } else {
+    res.status(404).end();
+  }
+});
+
 app.get("/info", (req, res) => {
   res.send(
     `<p>there are ${persons.length} person${
-      persons.length == 1 ? "" : "s"
+      persons.length === 1 ? "" : "s"
     } in the phone book</p><p>${new Date()}</p>`
   );
 });
