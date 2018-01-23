@@ -15,6 +15,7 @@ app.use(
   morgan(":method :url :body :status :res[content-length] - :response-time ms")
 );
 app.use(cors());
+app.use(express.static("public"));
 
 let persons = [
   {
