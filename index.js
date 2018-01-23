@@ -3,8 +3,14 @@ const app = express();
 const bodyParser = require("body-parser");
 const morgan = require("morgan");
 
+morgan.token("body", function(req, res) {
+  return JSON.stringify(req.body);
+});
+
 app.use(bodyParser.json());
-app.use(morgan("tiny"));
+app.use(
+  morgan(":method :url :body :status :res[content-length] - :response-time ms")
+);
 
 let persons = [
   {
@@ -55,7 +61,7 @@ app.delete("/api/persons/:id", (req, res) => {
 });
 
 app.post("/api/persons", (req, res) => {
-  const person = req.body;
+  const person = Object.assign({}, req.body);
 
   if (!person.name) {
     res.status(400).json({ error: "no name supplied" });
