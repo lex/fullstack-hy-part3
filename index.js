@@ -6,6 +6,8 @@ const cors = require("cors");
 
 const PORT = process.env.PORT || 3001;
 
+const Person = require("./models/person");
+
 morgan.token("body", function(req, res) {
   return JSON.stringify(req.body);
 });
@@ -17,75 +19,71 @@ app.use(
 app.use(cors());
 app.use(express.static("public"));
 
-let persons = [
-  {
-    name: "Arto Hellas",
-    number: "040-123456",
-    id: 1
-  },
-  {
-    name: "Martti Tienari",
-    number: "040-123456",
-    id: 2
-  },
-  {
-    name: "Arto Järvinen",
-    number: "040-123456",
-    id: 3
-  },
-  {
-    name: "Lea Kutvonen",
-    number: "040-123456",
-    id: 4
-  }
-];
-
 app.get("/", (req, res) => {
   res.send("<h1>Hello World!</h1>");
 });
 
 app.get("/api/persons", (req, res) => {
-  res.json(persons);
+  Person.find({})
+    .then(persons => res.json(persons.map(Person.format)))
+    .catch(error => {
+      console.log(error);
+      response.status(400).send({ error: "something went wrong" });
+    });
 });
 
 app.get("/api/persons/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const person = persons.find(p => p.id === id);
-
-  if (person) {
-    res.json(person);
-  } else {
-    res.status(404).end();
-  }
+  Person.findById(req.params.id)
+    .then(person => {
+      if (person) {
+        res.json(Person.format(person));
+      } else {
+        res.status(404).end();
+      }
+    })
+    .catch(error => {
+      console.log(error);
+      response.status(400).send({ error: "something went wrong" });
+    });
 });
 
 app.delete("/api/persons/:id", (req, res) => {
-  const id = Number(req.params.id);
-  persons = persons.filter(p => p.id !== id);
-  res.status(204).end();
+  const id = req.params.id;
+
+  Person.findByIdAndRemove(id)
+    .then(result => {
+      res.status(204).end();
+    })
+    .catch(error => {
+      console.log(error);
+      response.status(400).send({ error: "something went wrong" });
+    });
 });
 
 app.post("/api/persons", (req, res) => {
-  const person = Object.assign({}, req.body);
+  const body = req.body;
 
-  if (!person.name) {
+  if (!body.name) {
     res.status(400).json({ error: "no name supplied" });
     return;
   }
 
-  if (!person.number) {
+  if (!body.number) {
     res.status(400).json({ error: "no number supplied" });
     return;
   }
 
-  if (persons.filter(p => p.name === person.name).length === 1) {
-    res.status(400).json({ error: "name must be unique" });
-    return;
-  }
+  const person = new Person({ name: body.name, number: body.number });
 
-  person.id = ~~(Math.random() * 100000);
-  persons.push(person);
-  res.json(person);
+  person
+    .save()
+    .then(savedPerson => {
+      res.json(Person.format(savedPerson));
+    })
+    .catch(error => {
+      console.log(error);
+      response.status(400).send({ error: "something went wrong" });
+    });
 });
 
 app.get("/info", (req, res) => {
