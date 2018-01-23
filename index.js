@@ -54,6 +54,22 @@ app.delete("/api/persons/:id", (req, res) => {
 
 app.post("/api/persons", (req, res) => {
   const person = req.body;
+
+  if (!person.name) {
+    res.status(400).json({ error: "no name supplied" });
+    return;
+  }
+
+  if (!person.number) {
+    res.status(400).json({ error: "no number supplied" });
+    return;
+  }
+
+  if (persons.filter(p => p.name === person.name).length === 1) {
+    res.status(400).json({ error: "name must be unique" });
+    return;
+  }
+
   person.id = ~~(Math.random() * 100000);
   persons.push(person);
   res.json(person);
