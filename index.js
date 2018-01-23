@@ -86,6 +86,21 @@ app.post("/api/persons", (req, res) => {
     });
 });
 
+app.put("/api/persons/:id", (req, res) => {
+  const id = req.params.id;
+  const body = req.body;
+  const person = { name: body.name, number: body.number };
+
+  Person.findByIdAndUpdate(id, person, { new: true })
+    .then(updatedPerson => {
+      res.json(Person.format(updatedPerson));
+    })
+    .catch(error => {
+      console.log(error);
+      response.status(400).send({ error: "something went wrong" });
+    });
+});
+
 app.get("/info", (req, res) => {
   res.send(
     `<p>there are ${persons.length} person${
